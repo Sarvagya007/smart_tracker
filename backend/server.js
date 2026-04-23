@@ -19,9 +19,16 @@ const PORT = process.env.PORT || 5000;
 
 // ── Middleware ──────────────────────────────────────────────
 // Allow requests from the Vite dev server
-// Allow requests from the frontend (Vercel URL in production, localhost in dev)
+// Allow requests from the frontend (dynamic check for Vercel and Localhost)
 app.use(cors({ 
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173', 
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl) or matching our patterns
+    if (!origin || origin.includes('vercel.app') || origin.includes('localhost')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true 
 }));
 
