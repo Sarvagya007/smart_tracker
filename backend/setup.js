@@ -40,22 +40,9 @@ async function main() {
 
   console.log('\n🔧 Smart Job Prep Tracker — Database Setup\n');
 
-  // Step 1: Create the database (ignore error if it already exists)
-  console.log(`📦 Creating database "${dbName}"...`);
-  const adminClient = new Client({ connectionString: adminUrl });
-  await adminClient.connect();
-  try {
-    await adminClient.query(`CREATE DATABASE ${dbName}`);
-    console.log(`✅ Database "${dbName}" created.`);
-  } catch (err) {
-    if (err.code === '42P04') {
-      console.log(`ℹ️  Database "${dbName}" already exists — skipping.`);
-    } else {
-      throw err;
-    }
-  } finally {
-    await adminClient.end();
-  }
+  // Step 1: Skip database creation on managed services (like Render/RDS)
+  // Most hosted DBs give you a connection string to a specific DB already.
+  console.log(`📦 Preparing database schema...`);
 
   // Step 2: Create tables
   console.log('\n📋 Creating tables...');
