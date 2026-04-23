@@ -19,7 +19,11 @@ const PORT = process.env.PORT || 5000;
 
 // ── Middleware ──────────────────────────────────────────────
 // Allow requests from the Vite dev server
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+// Allow requests from the frontend (Vercel URL in production, localhost in dev)
+app.use(cors({ 
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173', 
+  credentials: true 
+}));
 
 // Parse JSON request bodies
 app.use(express.json());

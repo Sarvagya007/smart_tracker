@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { PROBLEMS } from '../data/problems';
+import api from '../api/axios';
 
 const TrackerContext = createContext(null);
 
@@ -26,10 +27,8 @@ export const TrackerProvider = ({ children }) => {
         return;
       }
       try {
-        const res = await fetch('http://localhost:5000/submissions', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
+        const res = await api.get('/submissions');
+        const data = res.data;
         const backendProgress = {};
         data.forEach(sub => {
           backendProgress[sub.problem_id || sub.problem_name] = {
@@ -66,22 +65,15 @@ export const TrackerProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token && problem) {
       try {
-        await fetch('http://localhost:5000/submissions', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-          },
-          body: JSON.stringify({
-            problem_id: problem.id,
-            problem_name: problem.name,
-            topic: problem.topic,
-            difficulty: problem.difficulty,
-            status: newEntry.status.toLowerCase(),
-            time_taken: newEntry.timeTaken,
-            notes: newEntry.notes,
-            revisit: newEntry.revisit
-          })
+        await api.post('/submissions', {
+          problem_id: problem.id,
+          problem_name: problem.name,
+          topic: problem.topic,
+          difficulty: problem.difficulty,
+          status: newEntry.status.toLowerCase(),
+          time_taken: newEntry.timeTaken,
+          notes: newEntry.notes,
+          revisit: newEntry.revisit
         });
       } catch (err) {
         console.error('Failed to sync progress:', err);
